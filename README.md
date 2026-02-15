@@ -27,3 +27,11 @@ The full application state is persisted in `IndexedDB` (`bizop-db`) so onboardin
 - Tenant isolation rules are defined in `firestore.rules` and `firebase.security.json`.
 
 # DX-tools
+
+## Netlify Deploy (Manual Ready)
+- Build command: `npm run build`
+- Publish directory: `dist`
+- SPA routing is already configured via `public/_redirects` and `netlify.toml`.
+- If deploying from Netlify UI:
+  1. Build locally with `npm run build`
+  2. Upload the `dist` folder (contains `_redirects` for routing fallback)
