@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "policy": {
+    "path": "users/{uid}/**",
+    "allowRead": "auth.uid == uid",
+    "allowWrite": "auth.uid == uid",
+    "notes": "Isolates tenant data so Shop A cannot read/write Shop B."
+  },
+  "dailyReportSchema": {
+    "collection": "users/{uid}/dailyReports/{yyyy-mm-dd}",
+    "requiredFields": [
+      "syncedAt",
+      "reportDate",
+      "data"
+    ]
+  }
+}
