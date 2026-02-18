@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { addServiceExpense } from '../features/businessSlice';
@@ -38,9 +38,9 @@ const ExpenseLog: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white border rounded-2xl p-4">Revenue: <span className="font-black">Rs {totalRevenue}</span></div>
-        <div className="bg-white border rounded-2xl p-4">Expenses: <span className="font-black">Rs {totalExpense}</span></div>
-        <div className="bg-white border rounded-2xl p-4">Profit: <span className="font-black">Rs {profit}</span></div>
+        <div className="bg-white border rounded-2xl p-4">Revenue: <span className="font-black">₹ {totalRevenue}</span></div>
+        <div className="bg-white border rounded-2xl p-4">Expenses: <span className="font-black">₹ {totalExpense}</span></div>
+        <div className="bg-white border rounded-2xl p-4">Profit: <span className="font-black">₹ {profit}</span></div>
       </div>
 
       <form onSubmit={addExpense} className="bg-white border rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-2">
@@ -70,9 +70,9 @@ const ExpenseLog: React.FC = () => {
               <tr key={e.id}>
                 <td className="p-3">{e.date}</td>
                 <td className="p-3">{e.jobId || '-'}</td>
-                <td className="p-3">Rs {e.travelExpense}</td>
-                <td className="p-3">Rs {e.materialCost}</td>
-                <td className="p-3 font-bold">Rs {e.travelExpense + e.materialCost}</td>
+                <td className="p-3">₹ {e.travelExpense}</td>
+                <td className="p-3">₹ {e.materialCost}</td>
+                <td className="p-3 font-bold">₹ {e.travelExpense + e.materialCost}</td>
               </tr>
             ))}
             {expenses.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-slate-400">No expenses logged.</td></tr>}

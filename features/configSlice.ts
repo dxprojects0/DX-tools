@@ -1,19 +1,25 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ConfigState, ToolFeature } from '../types';
+import { UserPlan, UserRole } from '../utils/plans';
 
 const initialState: ConfigState = {
   shopName: '',
   ownerName: '',
+  phoneNumber: '',
   hasSeenPrompt: false,
   selectedProfessionId: null,
   onboardingCompleted: false,
+  authResolved: false,
   customTools: [],
   firstUseAt: null,
   lastLoginPromptDate: null,
   isAuthenticated: false,
   authUid: null,
   authEmail: null,
+  authDisplayName: null,
   authMethod: null,
+  role: 'user',
+  isAdmin: false,
   plan: 'free',
   proStartedAt: null,
   lastCloudSyncAt: null,
@@ -36,6 +42,9 @@ const configSlice = createSlice({
       state.hasSeenPrompt = true;
       if (!state.firstUseAt) state.firstUseAt = new Date().toISOString();
     },
+    setPhoneNumber: (state, action: PayloadAction<string>) => {
+      state.phoneNumber = action.payload;
+    },
     setProfession: (state, action: PayloadAction<string>) => {
       if (!state.selectedProfessionId) {
         state.selectedProfessionId = action.payload;
@@ -55,18 +64,107 @@ const configSlice = createSlice({
     markLoginPromptShownToday: (state, action: PayloadAction<string>) => {
       state.lastLoginPromptDate = action.payload;
     },
-    markAuthenticated: (state, action: PayloadAction<{ uid: string; method: 'google' | 'phone'; email?: string | null }>) => {
+    markAuthenticated: (
+      state,
+      action: PayloadAction<{
+        uid: string;
+        method: 'google' | 'phone' | 'email';
+        email?: string | null;
+        displayName?: string | null;
+        role?: UserRole;
+        isAdmin?: boolean;
+      }>,
+    ) => {
       state.isAuthenticated = true;
+      state.authResolved = true;
       state.authUid = action.payload.uid;
       state.authMethod = action.payload.method;
       state.authEmail = action.payload.email || null;
+      state.authDisplayName = action.payload.displayName || null;
+      state.role = action.payload.role || (action.payload.isAdmin ? 'admin' : 'user');
+      state.isAdmin = state.role === 'admin';
+    },
+    markSignedOut: (state) => {
+      state.isAuthenticated = false;
+      state.authResolved = true;
+      state.authUid = null;
+      state.authEmail = null;
+      state.authDisplayName = null;
+      state.authMethod = null;
+      state.role = 'user';
+      state.isAdmin = false;
+    },
+    setAdminAccess: (state, action: PayloadAction<boolean>) => {
+      state.isAdmin = action.payload;
+      state.role = action.payload ? 'admin' : 'user';
+    },
+    applyRemoteProfile: (
+      state,
+      action: PayloadAction<{
+        shopName?: string | null;
+        ownerName?: string | null;
+        phoneNumber?: string | null;
+        selectedProfessionId?: string | null;
+        plan?: UserPlan;
+        role?: UserRole;
+      }>,
+    ) => {
+      if (action.payload.shopName) state.shopName = action.payload.shopName;
+      if (action.payload.ownerName) state.ownerName = action.payload.ownerName;
+      if (action.payload.phoneNumber !== undefined && action.payload.phoneNumber !== null) state.phoneNumber = action.payload.phoneNumber;
+      if (action.payload.selectedProfessionId) state.selectedProfessionId = action.payload.selectedProfessionId;
+      if (action.payload.role) {
+        state.role = action.payload.role;
+        state.isAdmin = action.payload.role === 'admin';
+      }
+      if (action.payload.plan) state.plan = action.payload.plan;
+      if (state.shopName && state.ownerName && state.selectedProfessionId && state.phoneNumber) {
+        state.onboardingCompleted = true;
+      }
+    },
+    hydrateConfigData: (
+      state,
+      action: PayloadAction<{
+        shopName?: string;
+        ownerName?: string;
+        phoneNumber?: string;
+        selectedProfessionId?: string | null;
+        onboardingCompleted?: boolean;
+        authResolved?: boolean;
+        customTools?: ToolFeature[];
+        plan?: UserPlan;
+        role?: UserRole;
+        tasks?: { id: string; title: string; done: boolean; createdAt: string }[];
+        themeMode?: 'light' | 'dark';
+        themePalette?: string;
+      }>,
+    ) => {
+      const payload = action.payload;
+      if (payload.shopName !== undefined) state.shopName = payload.shopName;
+      if (payload.ownerName !== undefined) state.ownerName = payload.ownerName;
+      if (payload.phoneNumber !== undefined) state.phoneNumber = payload.phoneNumber;
+      if (payload.selectedProfessionId !== undefined) state.selectedProfessionId = payload.selectedProfessionId;
+      if (payload.onboardingCompleted !== undefined) state.onboardingCompleted = payload.onboardingCompleted;
+      if (payload.authResolved !== undefined) state.authResolved = payload.authResolved;
+      if (payload.customTools) state.customTools = payload.customTools;
+      if (payload.plan) state.plan = payload.plan;
+      if (payload.role) {
+        state.role = payload.role;
+        state.isAdmin = payload.role === 'admin';
+      }
+      if (payload.tasks) state.tasks = payload.tasks;
+      if (payload.themeMode) state.themeMode = payload.themeMode;
+      if (payload.themePalette) state.themePalette = payload.themePalette;
     },
     signOutUser: (state) => {
-      const preservedPalette = state.themePalette;
-      const preservedMode = state.themeMode;
-      Object.assign(state, initialState);
-      state.themePalette = preservedPalette;
-      state.themeMode = preservedMode;
+      state.isAuthenticated = false;
+      state.authResolved = true;
+      state.authUid = null;
+      state.authEmail = null;
+      state.authDisplayName = null;
+      state.authMethod = null;
+      state.role = 'user';
+      state.isAdmin = false;
     },
     completeOnboarding: (state) => {
       state.onboardingCompleted = true;
@@ -79,9 +177,9 @@ const configSlice = createSlice({
     setThemePalette: (state, action: PayloadAction<string>) => {
       state.themePalette = action.payload;
     },
-    setPlan: (state, action: PayloadAction<'free' | 'pro'>) => {
+    setPlan: (state, action: PayloadAction<UserPlan>) => {
       state.plan = action.payload;
-      if (action.payload === 'pro' && !state.proStartedAt) {
+      if ((action.payload === 'pro' || action.payload === 'business') && !state.proStartedAt) {
         state.proStartedAt = new Date().toISOString();
       }
     },
@@ -111,11 +209,16 @@ const configSlice = createSlice({
 export const {
   setShopName,
   setOwnerName,
+  setPhoneNumber,
   setProfession,
   toggleCustomTool,
   setCustomTools,
   markLoginPromptShownToday,
   markAuthenticated,
+  markSignedOut,
+  setAdminAccess,
+  applyRemoteProfile,
+  hydrateConfigData,
   signOutUser,
   completeOnboarding,
   setThemeMode,

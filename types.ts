@@ -1,3 +1,5 @@
+import type { UserPlan, UserRole } from './utils/plans';
+
 export type ToolFeature =
   | 'billing'
   | 'inventory'
@@ -38,6 +40,7 @@ export interface InventoryItem {
   supplier?: string;
   batchNo?: string;
   expiryDate?: string;
+  weightKg?: number;
 }
 
 export interface Customer {
@@ -71,6 +74,7 @@ export interface LedgerEntry {
   id: string;
   customerName: string;
   customerPhone: string;
+  customerAddress?: string;
   amount: number;
   paid: number;
   date: string;
@@ -102,7 +106,7 @@ export interface KOTOrder {
   id: string;
   table: string;
   items: { name: string; qty: number }[];
-  status: 'New' | 'Preparing' | 'Ready';
+  status: 'New' | 'Preparing' | 'Ready' | 'Delivered';
   startTime: string;
 }
 
@@ -193,17 +197,22 @@ export interface JobTicket {
 export interface ConfigState {
   shopName: string;
   ownerName: string;
+  phoneNumber: string;
   hasSeenPrompt: boolean;
   selectedProfessionId: string | null;
   onboardingCompleted: boolean;
+  authResolved: boolean;
   customTools: ToolFeature[];
   firstUseAt: string | null;
   lastLoginPromptDate: string | null;
   isAuthenticated: boolean;
   authUid: string | null;
   authEmail: string | null;
-  authMethod: 'google' | 'phone' | null;
-  plan: 'free' | 'pro';
+  authDisplayName: string | null;
+  authMethod: 'google' | 'phone' | 'email' | null;
+  role: UserRole;
+  isAdmin: boolean;
+  plan: UserPlan;
   proStartedAt: string | null;
   lastCloudSyncAt: string | null;
   tasks: { id: string; title: string; done: boolean; createdAt: string }[];

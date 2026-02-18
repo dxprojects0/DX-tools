@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { addItem, deleteItem, stockIn, deductStock } from '../features/inventorySlice';
@@ -123,7 +123,7 @@ const Inventory: React.FC = () => {
                     </td>
                     <td className="p-3 text-sm">{item.supplier || '-'}</td>
                     <td className="p-3 text-sm">{item.batchNo || '-'} {item.expiryDate ? `| ${item.expiryDate}` : ''}</td>
-                    <td className="p-3 text-sm">Rs {item.costPrice} / Rs {item.sellingPrice} <span className="text-green-700 font-semibold">(Rs {margin})</span></td>
+                    <td className="p-3 text-sm">₹ {item.costPrice} / ₹ {item.sellingPrice} <span className="text-green-700 font-semibold">(₹ {margin})</span></td>
                     <td className="p-3">
                       <button className="text-red-600 text-sm" onClick={() => dispatch(deleteItem(item.id))}>Delete</button>
                     </td>

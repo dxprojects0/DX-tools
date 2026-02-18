@@ -13,6 +13,9 @@ const customerSlice = createSlice({
   name: 'customers',
   initialState,
   reducers: {
+    hydrateCustomers: (state, action: PayloadAction<CustomerState>) => {
+      state.list = action.payload.list || [];
+    },
     addCustomer: (state, action: PayloadAction<Omit<Customer, 'id'>>) => {
       state.list.push({ ...action.payload, id: `cust-${Date.now()}` });
     },
@@ -25,5 +28,5 @@ const customerSlice = createSlice({
   },
 });
 
-export const { addCustomer, updateCustomer } = customerSlice.actions;
+export const { hydrateCustomers, addCustomer, updateCustomer } = customerSlice.actions;
 export default customerSlice.reducer;

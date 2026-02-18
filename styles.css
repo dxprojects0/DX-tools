@@ -1,0 +1,117 @@
+:root{
+  --bg: #0f1724;
+  --surface: #ffffff;
+  --muted: #6b7280;
+  --primary: #1e90ff;
+  --accent: #6db8ff;
+  --card-shadow: 0 8px 30px rgba(16,24,40,0.08);
+}
+
+/* Basic resets and typography tweaks to make site feel premium */
+html,body,#root{height:100%;}
+body{
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: var(--background);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+.max-w-7xl{max-width:1120px;margin-left:auto;margin-right:auto;padding-left:16px;padding-right:16px}
+
+.rounded-3xl{border-radius:20px}
+.rounded-2xl{border-radius:14px}
+.rounded-xl{border-radius:10px}
+
+.bg-surface{background:var(--surface)}
+.text-subtle{color:var(--text-secondary)}
+.text-primary-app{color:var(--primary)}
+.border-app{border-color:var(--border)}
+
+/* Parallax hero background helpers */
+.hero-bg{
+  position:absolute;inset:0;z-index:0;pointer-events:none;transform:translate3d(0,0,0);transition:transform .18s linear;
+}
+
+.hero-content{position:relative;z-index:1}
+
+/* Pricing cards */
+.pricing-grid{display:flex;gap:18px;flex-wrap:wrap}
+.pricing-card{flex:1 1 320px;background:linear-gradient(180deg, #ffffff, #fffaf6);border-radius:14px;border:1px solid rgba(220,220,230,0.9);box-shadow:var(--card-shadow);overflow:hidden;transition:all .32s cubic-bezier(.2,.9,.2,1);}
+.pricing-card.small{height:140px}
+.pricing-card.expanded{flex-basis:100%;}
+.pricing-header{padding:22px 20px;display:flex;align-items:center;justify-content:space-between}
+.pricing-badge{display:flex;align-items:center;gap:8px}
+.price-amount{font-weight:800;font-size:28px}
+.price-strike{color:var(--muted);text-decoration:line-through;margin-right:8px}
+.features{padding:14px 20px;border-top:1px solid rgba(230,230,240,0.8);}
+.feature{display:flex;align-items:flex-start;gap:10px;padding:8px 0;color:#334155}
+.feature.locked{opacity:.48}
+.toggle-btn{cursor:pointer}
+
+/* Small responsive tweaks */
+@media (max-width:800px){
+  .pricing-grid{flex-direction:column}
+  .pricing-card.expanded{flex-basis:auto}
+}
+
+/* Smooth transitions for dashboard sections */
+.smooth-transition{transition:transform .28s cubic-bezier(.2,.9,.2,1),opacity .28s ease}
+
+/* Accent for primary CTA */
+.cta-primary{background:linear-gradient(90deg,var(--primary),#4fa8ff);color:#fff;padding:10px 16px;border-radius:10px;font-weight:700}
+
+/* Plus icon rotation helper */
+.plus-rot{transition:transform .28s cubic-bezier(.2,.9,.2,1);transform-origin:center center;}
+.plus-rot.open{transform:rotate(45deg) scale(1.02)}
+
+/* page wrapper transition */
+.page-wrapper{transition:all .32s cubic-bezier(.2,.9,.2,1);will-change:transform,opacity}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-rise{
+  animation: rise-in .55s cubic-bezier(.2,.9,.2,1) both;
+}
+
+.animate-rise-delayed{
+  animation: rise-in .72s cubic-bezier(.2,.9,.2,1) both;
+}
+
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  overflow: hidden;
+  background: rgba(2, 6, 23, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.modal-shell{
+  width: 100%;
+  max-width: 34rem;
+  max-height: calc(100dvh - 1.5rem);
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 20px 60px rgba(2, 6, 23, 0.28);
+}
+
+@media (max-width: 640px){
+  .modal-overlay{
+    padding: 0.5rem;
+  }
+  .modal-shell{
+    max-height: calc(100dvh - 1rem);
+  }
+}
+

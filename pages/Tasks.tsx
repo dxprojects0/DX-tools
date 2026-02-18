@@ -12,7 +12,7 @@ const Tasks: React.FC = () => {
   const completedCount = tasks.filter((task) => task.done).length;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-20">
+    <div className="max-w-4xl mx-auto space-y-6 pb-24 md:pb-20 overflow-x-hidden">
       <section className="rounded-[2rem] border border-app bg-surface p-6 md:p-8">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-2xl bg-black/5"><ListTodo size={20} /></div>
@@ -23,7 +23,7 @@ const Tasks: React.FC = () => {
         </div>
       </section>
 
-      <section className="rounded-[2rem] border border-app bg-surface p-6">
+      <section className="rounded-[1rem] border border-app bg-surface p-3">
         <div className="flex gap-2 mb-4">
           <input
             value={newTask}
@@ -39,11 +39,11 @@ const Tasks: React.FC = () => {
             }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-app text-white font-semibold"
           >
-            <Plus size={16} /> Add
+            <Plus size={16}/>
           </button>
         </div>
         <div className="text-xs text-subtle mb-3">{completedCount}/{tasks.length} done</div>
-        <div className="space-y-3">
+        <div className="space-y-3 max-h-[62vh] overflow-y-auto overflow-x-hidden pr-0.5">
           {tasks.map((task) => (
             <div key={task.id} className="rounded-2xl border border-app px-4 py-3 flex items-center gap-3">
               <button onClick={() => dispatch(toggleTask(task.id))} className="shrink-0">

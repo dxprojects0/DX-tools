@@ -1,107 +1,112 @@
-
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useMemo, useState } from 'react';
+import { Check, Phone, Plus, Search, X } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { addAppointment, updateAppointmentStatus } from '../features/businessSlice';
-import { Calendar, Plus, Phone, User, Check, X, Bell } from 'lucide-react';
 import Drawer from '../components/Drawer';
-import { shareData } from '../utils/share';
 
 const Appointments: React.FC = () => {
   const dispatch = useDispatch();
   const appointments = useSelector((state: RootState) => state.business.appointments);
   const [isOpen, setIsOpen] = useState(false);
-  
+  const [search, setSearch] = useState('');
   const [form, setForm] = useState({ name: '', phone: '', date: '', time: '' });
+
+  const filtered = useMemo(() => {
+    const token = search.trim().toLowerCase();
+    if (!token) return appointments;
+    return appointments.filter((appointment) =>
+      [appointment.patientName, appointment.patientPhone, appointment.date, appointment.time].some((field) =>
+        String(field || '').toLowerCase().includes(token),
+      ),
+    );
+  }, [appointments, search]);
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(addAppointment({
-      id: `APP-${Date.now()}`,
-      patientName: form.name,
-      patientPhone: form.phone,
-      date: form.date,
-      time: form.time,
-      status: 'Booked'
-    }));
+    dispatch(
+      addAppointment({
+        id: `APP-${Date.now()}`,
+        patientName: form.name.trim(),
+        patientPhone: form.phone.trim(),
+        date: form.date,
+        time: form.time,
+        status: 'Booked',
+      }),
+    );
+    setForm({ name: '', phone: '', date: '', time: '' });
     setIsOpen(false);
   };
 
-  const sendReminder = (appt: any) => {
-    const text = `Hello ${appt.patientName}, your appointment is confirmed for ${appt.date} at ${appt.time}. Please arrive 10 mins early. Thank you!`;
-    shareData("Appointment Reminder", text);
-  };
-
   return (
-    <div className="space-y-8 animate-slide-up">
-      <div className="flex justify-between items-center">
+    <div className="space-y-5 pb-20">
+      <section className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h1 className="text-3xl font-black text-slate-800">Doctor <span className="text-primary">Calendar</span></h1>
-          <p className="text-slate-500 font-medium">Manage patient bookings and attendance.</p>
+          <h1 className="text-3xl font-black">Appointments</h1>
+          <p className="text-sm text-subtle">Simple appointment workflow for clinic visits.</p>
         </div>
-        <button onClick={() => setIsOpen(true)} className="px-6 py-3 bg-primary text-white rounded-2xl font-black shadow-lg flex items-center gap-2 hover:bg-blue-600 transition-all">
-          <Plus size={18} /> New Booking
+        <button onClick={() => setIsOpen(true)} className="px-4 py-2 rounded-xl bg-primary-app text-white font-semibold inline-flex items-center gap-2">
+          <Plus size={15} /> New Booking
         </button>
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest px-2">Scheduled Visits</h3>
-          {appointments.map(appt => (
-            <div key={appt.id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-6 group hover:shadow-md transition-all">
-               <div className="p-4 bg-slate-50 rounded-2xl flex flex-col items-center justify-center min-w-[70px]">
-                  <span className="text-primary font-black text-lg">{appt.time}</span>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">{appt.date.split('-').slice(1).join('/')}</span>
-               </div>
-               <div className="flex-1">
-                  <h4 className="font-black text-slate-800 text-lg">{appt.patientName}</h4>
-                  <div className="flex gap-4 text-xs font-bold text-slate-400 mt-1">
-                     <span className="flex items-center gap-1"><Phone size={12} /> {appt.patientPhone}</span>
-                     <span className={`uppercase ${appt.status === 'Booked' ? 'text-blue-500' : appt.status === 'Visited' ? 'text-green-500' : 'text-red-500'}`}>{appt.status}</span>
-                  </div>
-               </div>
-               <div className="flex gap-2">
-                  <button onClick={() => sendReminder(appt)} className="p-3 bg-blue-50 text-primary rounded-xl hover:bg-blue-100"><Bell size={18} /></button>
-                  {appt.status === 'Booked' && (
-                    <>
-                      <button onClick={() => dispatch(updateAppointmentStatus({ id: appt.id, status: 'Visited' }))} className="p-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100"><Check size={18} /></button>
-                      <button onClick={() => dispatch(updateAppointmentStatus({ id: appt.id, status: 'Cancelled' }))} className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100"><X size={18} /></button>
-                    </>
-                  )}
-               </div>
+      <section className="bg-surface border border-app rounded-2xl p-4 space-y-3">
+        <div className="flex items-center gap-2 border border-app rounded-xl px-3 py-2">
+          <Search size={15} className="text-subtle" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by patient name or phone"
+            className="w-full bg-transparent outline-none text-sm"
+          />
+        </div>
+
+        <div className="space-y-2 max-h-[62vh] overflow-y-auto">
+          {filtered.map((appointment) => (
+            <div key={appointment.id} className="border border-app rounded-xl p-3 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-semibold text-sm">{appointment.patientName}</p>
+                  <p className="text-xs text-subtle inline-flex items-center gap-1"><Phone size={12} /> {appointment.patientPhone}</p>
+                </div>
+                <span className={`text-xs px-2 py-1 rounded-full border ${
+                  appointment.status === 'Booked'
+                    ? 'bg-blue-50 text-blue-700 border-blue-100'
+                    : appointment.status === 'Visited'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                      : 'bg-red-50 text-red-700 border-red-100'
+                }`}>{appointment.status}</span>
+              </div>
+              <p className="text-xs text-subtle">{appointment.date} • {appointment.time}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => dispatch(updateAppointmentStatus({ id: appointment.id, status: 'Visited' }))}
+                  className="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold inline-flex items-center justify-center gap-1"
+                >
+                  <Check size={13} /> Visited
+                </button>
+                <button
+                  onClick={() => dispatch(updateAppointmentStatus({ id: appointment.id, status: 'Cancelled' }))}
+                  className="px-3 py-2 rounded-lg border border-[var(--danger)] text-[color:var(--danger)] text-sm font-semibold inline-flex items-center justify-center gap-1"
+                >
+                  <X size={13} /> Cancel
+                </button>
+              </div>
             </div>
           ))}
-          {appointments.length === 0 && (
-            <div className="p-12 text-center text-slate-300 font-bold bg-white rounded-3xl border-2 border-dashed border-slate-100">
-               No appointments found.
-            </div>
-          )}
+          {filtered.length === 0 && <p className="text-sm text-subtle py-2">No appointments found.</p>}
         </div>
-        
-        <div className="bg-slate-900 rounded-3xl p-8 text-white h-fit">
-           <h3 className="text-xl font-black mb-4">Quick Stats</h3>
-           <div className="space-y-4">
-              <div className="flex justify-between items-center py-3 border-b border-white/10">
-                 <span className="text-slate-400 font-bold">Today</span>
-                 <span className="text-primary font-black">8 Patients</span>
-              </div>
-              <div className="flex justify-between items-center py-3 border-b border-white/10">
-                 <span className="text-slate-400 font-bold">No-Shows</span>
-                 <span className="text-red-400 font-black">2%</span>
-              </div>
-           </div>
-        </div>
-      </div>
+      </section>
 
       <Drawer title="Book Appointment" isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <form onSubmit={handleAdd} className="space-y-4">
-          <input required placeholder="Patient Name" className="w-full p-4 border border-slate-100 rounded-2xl font-bold" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
-          <input required placeholder="Phone Number" className="w-full p-4 border border-slate-100 rounded-2xl font-bold" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
-          <div className="grid grid-cols-2 gap-4">
-            <input required type="date" className="w-full p-4 border border-slate-100 rounded-2xl font-bold" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
-            <input required type="time" className="w-full p-4 border border-slate-100 rounded-2xl font-bold" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
+        <form onSubmit={handleAdd} className="space-y-3">
+          <input required placeholder="Patient name" className="w-full border border-app rounded-xl px-3 py-2 bg-transparent" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <input required placeholder="Phone number" className="w-full border border-app rounded-xl px-3 py-2 bg-transparent" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <div className="grid grid-cols-2 gap-2">
+            <input required type="date" className="w-full border border-app rounded-xl px-3 py-2 bg-transparent" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+            <input required type="time" className="w-full border border-app rounded-xl px-3 py-2 bg-transparent" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} />
           </div>
-          <button type="submit" className="w-full bg-primary text-white py-4 rounded-2xl font-black shadow-lg">Confirm Booking</button>
+          <button type="submit" className="w-full bg-primary-app text-white py-2.5 rounded-xl font-semibold">Confirm Booking</button>
         </form>
       </Drawer>
     </div>

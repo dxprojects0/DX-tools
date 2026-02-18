@@ -1,5 +1,6 @@
 import React from 'react';
-import { AlertCircle, X } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import Modal from './Modal';
 
 interface Props {
   isOpen: boolean;
@@ -13,18 +14,22 @@ const ConfirmationDialog: React.FC<Props> = ({ isOpen, onClose, onConfirm, title
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-4 text-red-500">
-            <div className="p-2 bg-red-50 rounded-full">
-              <AlertCircle size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-slate-800">{title}</h3>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      maxWidth="24rem"
+      closeOnBackdrop
+    >
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 text-red-500">
+          <div className="p-2 bg-red-50 rounded-full">
+            <AlertCircle size={24} />
           </div>
-          <p className="text-slate-500 leading-relaxed">{message}</p>
+          <h3 className="text-xl font-bold text-slate-800">{title}</h3>
         </div>
-        <div className="flex border-t border-slate-100">
+        <p className="text-slate-500 leading-relaxed">{message}</p>
+        <div className="flex border-t border-slate-100 pt-3">
           <button 
             onClick={onClose}
             className="flex-1 px-6 py-4 text-slate-500 font-bold hover:bg-slate-50 transition-colors"
@@ -39,7 +44,7 @@ const ConfirmationDialog: React.FC<Props> = ({ isOpen, onClose, onConfirm, title
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
 

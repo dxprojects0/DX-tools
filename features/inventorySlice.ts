@@ -13,6 +13,9 @@ const inventorySlice = createSlice({
   name: 'inventory',
   initialState,
   reducers: {
+    hydrateInventory: (state, action: PayloadAction<InventoryState>) => {
+      state.items = action.payload.items || [];
+    },
     addItem: (state, action: PayloadAction<Omit<InventoryItem, 'id' | 'usageHistory'>>) => {
       state.items.push({ ...action.payload, id: `inv-${Date.now()}`, usageHistory: [] });
     },
@@ -44,5 +47,5 @@ const inventorySlice = createSlice({
   },
 });
 
-export const { addItem, updateItem, updateStock, stockIn, deductStock, deleteItem } = inventorySlice.actions;
+export const { hydrateInventory, addItem, updateItem, updateStock, stockIn, deductStock, deleteItem } = inventorySlice.actions;
 export default inventorySlice.reducer;

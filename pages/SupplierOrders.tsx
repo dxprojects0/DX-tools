@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { addSupplierOrder, updateSupplierOrderStatus } from '../features/businessSlice';
@@ -70,7 +70,7 @@ const SupplierOrders: React.FC = () => {
               <tr key={order.id}>
                 <td className="p-3">{order.supplierName}</td>
                 <td className="p-3">{order.itemSummary}</td>
-                <td className="p-3">Rs {order.totalCost}</td>
+                <td className="p-3">₹ {order.totalCost}</td>
                 <td className="p-3">{order.status}</td>
                 <td className="p-3">
                   {order.status === 'Pending' ? (

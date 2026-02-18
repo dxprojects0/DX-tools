@@ -42,6 +42,18 @@ const businessSlice = createSlice({
   name: 'business',
   initialState,
   reducers: {
+    hydrateBusiness: (state, action: PayloadAction<BusinessState>) => {
+      state.ledger = action.payload.ledger || [];
+      state.appointments = action.payload.appointments || [];
+      state.kitchenOrders = action.payload.kitchenOrders || [];
+      state.supplierOrders = action.payload.supplierOrders || [];
+      state.healthRecords = action.payload.healthRecords || [];
+      state.staffShifts = action.payload.staffShifts || [];
+      state.warrantyLogs = action.payload.warrantyLogs || [];
+      state.serviceBookings = action.payload.serviceBookings || [];
+      state.serviceExpenses = action.payload.serviceExpenses || [];
+      state.expiryReturns = action.payload.expiryReturns || [];
+    },
     addLedgerEntry: (state, action: PayloadAction<LedgerEntry>) => {
       state.ledger.push(action.payload);
     },
@@ -68,6 +80,9 @@ const businessSlice = createSlice({
       const order = state.kitchenOrders.find((o) => o.id === action.payload.id);
       if (order) order.status = action.payload.status;
     },
+    deleteKitchenOrder: (state, action: PayloadAction<string>) => {
+      state.kitchenOrders = state.kitchenOrders.filter((order) => order.id !== action.payload);
+    },
 
     addSupplierOrder: (state, action: PayloadAction<SupplierOrder>) => {
       state.supplierOrders.push(action.payload);
@@ -79,6 +94,10 @@ const businessSlice = createSlice({
 
     addHealthRecord: (state, action: PayloadAction<HealthRecord>) => {
       state.healthRecords.push(action.payload);
+    },
+    updateHealthRecord: (state, action: PayloadAction<HealthRecord>) => {
+      const idx = state.healthRecords.findIndex((record) => record.id === action.payload.id);
+      if (idx !== -1) state.healthRecords[idx] = action.payload;
     },
 
     addStaffShift: (state, action: PayloadAction<StaffShift>) => {
@@ -112,15 +131,18 @@ const businessSlice = createSlice({
 });
 
 export const {
+  hydrateBusiness,
   addLedgerEntry,
   updateLedgerPayment,
   addAppointment,
   updateAppointmentStatus,
   addKitchenOrder,
   updateKitchenStatus,
+  deleteKitchenOrder,
   addSupplierOrder,
   updateSupplierOrderStatus,
   addHealthRecord,
+  updateHealthRecord,
   addStaffShift,
   updateStaffShift,
   addWarrantyLog,

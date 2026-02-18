@@ -1,17 +1,43 @@
 {
-  "version": 1,
-  "policy": {
-    "path": "users/{uid}/**",
-    "allowRead": "auth.uid == uid",
-    "allowWrite": "auth.uid == uid",
-    "notes": "Isolates tenant data so Shop A cannot read/write Shop B."
+  "version": 2,
+  "policies": {
+    "userScopedData": {
+      "paths": [
+        "users/{uid}/profile/data",
+        "users/{uid}/dashboard/data",
+        "users/{uid}/inventory/data",
+        "users/{uid}/tasks/data",
+        "usersSummary/{uid}"
+      ],
+      "allowRead": "auth.uid == uid || requesterRole == 'admin'",
+      "allowWrite": "auth.uid == uid || requesterRole == 'admin'",
+      "notes": "All application data is scoped by auth.uid only."
+    },
+    "adminManagement": {
+      "paths": [
+        "adminAccounts/{uid}",
+        "adminManagement/{docId}",
+        "marketingUsers/{code}",
+        "PaidInterests/{requestId}"
+      ],
+      "allowRead": "requesterRole == 'admin' OR public-read for marketingUsers/{code}",
+      "allowWrite": "requesterRole == 'admin' OR owner-create for PaidInterests/{requestId}",
+      "notes": "Centralized admin and management collections."
+    }
   },
-  "dailyReportSchema": {
-    "collection": "users/{uid}/dailyReports/{yyyy-mm-dd}",
+  "profileSchema": {
+    "document": "users/{uid}/profile/data",
     "requiredFields": [
-      "syncedAt",
-      "reportDate",
-      "data"
+      "uid",
+      "email",
+      "role",
+      "plan",
+      "shopName",
+      "ownerName",
+      "selectedProfessionId",
+      "phoneNumber",
+      "onboardingCompleted",
+      "updatedAt"
     ]
   }
 }

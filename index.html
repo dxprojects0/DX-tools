@@ -44,6 +44,10 @@
       .border-app { border-color: var(--border); }
       .bg-primary-app { background-color: var(--primary); }
       .text-primary-app { color: var(--primary); }
+      .bg-white { background-color: var(--surface) !important; }
+      .text-slate-900, .text-slate-800, .text-gray-900, .text-black { color: var(--text-primary) !important; }
+      .text-slate-700, .text-slate-600, .text-slate-500, .text-gray-500, .text-gray-600 { color: var(--text-secondary) !important; }
+      .border-slate-100, .border-slate-200, .border-gray-200, .border-gray-300 { border-color: var(--border) !important; }
       .custom-scrollbar::-webkit-scrollbar { width: 6px; }
       .custom-scrollbar::-webkit-scrollbar:horizontal { height: 6px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: var(--background); }
@@ -70,6 +74,10 @@
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-6px); }
       }
+      @keyframes modalUp {
+        0% { opacity: 0; transform: translateY(14px) scale(0.98); }
+        100% { opacity: 1; transform: translateY(0px) scale(1); }
+      }
       .hero-rotator { animation: heroShift 3.2s ease-in-out infinite; }
       .float-grid { animation: floatGrid 3.6s ease-in-out infinite; }
       .shimmer-button {
@@ -94,7 +102,7 @@
     }
     </script>
   </head>
-  <body class="text-slate-900 antialiased">
+  <body class="text-app bg-app antialiased">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

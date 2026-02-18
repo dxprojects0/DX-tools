@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { addTicket, deleteTicket, updateStage, updateTicket } from '../features/repairSlice';
@@ -118,10 +118,10 @@ const RepairJobs: React.FC = () => {
 
   const stageShareMessage = (job: JobTicket) => {
     if (job.stage === 'Diagnose' || job.stage === 'Diagnosing') {
-      return `Hello ${job.customerName}\nYour device (${job.device.brand} ${job.device.model}) is under diagnosis.\nEstimated cost: Rs ${job.estimatedCost}\n- ${shopName || 'Repair Shop'}\n${job.customerPhone}`;
+      return `Hello ${job.customerName}\nYour device (${job.device.brand} ${job.device.model}) is under diagnosis.\nEstimated cost: ₹ ${job.estimatedCost}\n- ${shopName || 'Repair Shop'}\n${job.customerPhone}`;
     }
     if (job.stage === 'Ready') {
-      return `Good news!\nYour device is ready for pickup.\nModel: ${job.device.brand} ${job.device.model}\nAmount: Rs ${job.finalAmount || job.estimatedCost}\nStatus: ${job.paid ? 'Paid' : 'Unpaid'}\n- ${shopName || 'Repair Shop'}\n${job.customerPhone}`;
+      return `Good news!\nYour device is ready for pickup.\nModel: ${job.device.brand} ${job.device.model}\nAmount: ₹ ${job.finalAmount || job.estimatedCost}\nStatus: ${job.paid ? 'Paid' : 'Unpaid'}\n- ${shopName || 'Repair Shop'}\n${job.customerPhone}`;
     }
     return `Job ${job.id} is currently in stage: ${job.stage}.\n- ${shopName || 'Repair Shop'}`;
   };
@@ -150,8 +150,8 @@ const RepairJobs: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="bg-white border rounded-xl p-4">Paid: <span className="font-black">Rs {totals.paid}</span></div>
-        <div className="bg-white border rounded-xl p-4">Unpaid: <span className="font-black">Rs {totals.unpaid}</span></div>
+        <div className="bg-white border rounded-xl p-4">Paid: <span className="font-black">₹ {totals.paid}</span></div>
+        <div className="bg-white border rounded-xl p-4">Unpaid: <span className="font-black">₹ {totals.unpaid}</span></div>
         <div className="bg-white border rounded-xl p-4">Open Jobs: <span className="font-black">{tickets.filter((t) => t.stage !== 'Delivered').length}</span></div>
       </div>
 

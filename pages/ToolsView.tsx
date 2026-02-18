@@ -1,56 +1,54 @@
 import React from 'react';
-import { useParams, Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { ToolFeature } from '../types';
 import { PRESET_TOOLS, TOOL_DEFINITIONS } from '../utils/catalog';
 import { ChevronRight } from 'lucide-react';
+import { buildUserToolRoute, ROUTES } from '../utils/routes';
+import { isPaidPlan } from '../utils/plans';
 
 const toolRouteMap: Record<ToolFeature, string> = {
-  billing: '/tool/billing',
-  inventory: '/tool/inventory',
-  ledger: '/tool/ledger',
-  ordering: '/tool/ordering',
-  reports: '/tool/reports',
-  expiry: '/tool/expiry',
-  appointments: '/tool/appointments',
-  ehr: '/tool/ehr',
-  kitchen: '/tool/kitchen',
-  staff: '/tool/staff',
-  repairTickets: '/tool/repairTickets',
-  warranty: '/tool/warranty',
-  jobBooking: '/tool/jobBooking',
-  expenses: '/tool/expenses',
+  billing: buildUserToolRoute('billing'),
+  inventory: buildUserToolRoute('inventory'),
+  ledger: buildUserToolRoute('ledger'),
+  ordering: buildUserToolRoute('ordering'),
+  reports: buildUserToolRoute('reports'),
+  expiry: buildUserToolRoute('expiry'),
+  appointments: buildUserToolRoute('appointments'),
+  ehr: buildUserToolRoute('ehr'),
+  kitchen: buildUserToolRoute('kitchen'),
+  staff: buildUserToolRoute('staff'),
+  repairTickets: buildUserToolRoute('repairTickets'),
+  warranty: buildUserToolRoute('warranty'),
+  jobBooking: buildUserToolRoute('jobBooking'),
+  expenses: buildUserToolRoute('expenses'),
 };
 
 const ToolsView: React.FC = () => {
-  const { professionId } = useParams<{ professionId: string }>();
   const navigate = useNavigate();
-  const { customTools, selectedProfessionId, plan } = useSelector((state: RootState) => state.config);
+  const { customTools, selectedProfessionId, plan, isAdmin } = useSelector((state: RootState) => state.config);
 
-  let activeTools: ToolFeature[] = [];
-  let title = 'Tools';
-
-  if (professionId === 'custom' || professionId === 'main') {
-    const presetTools = selectedProfessionId ? PRESET_TOOLS[selectedProfessionId] || [] : [];
-    activeTools = plan === 'pro'
-      ? Array.from(new Set([...(customTools || []), ...presetTools]))
-      : [...(customTools || [])];
-    title = plan === 'pro' ? 'All Selected Tools' : 'Selected Tools';
-  } else if (professionId && PRESET_TOOLS[professionId]) {
-    activeTools = PRESET_TOOLS[professionId] || [];
-    title = `${professionId.charAt(0).toUpperCase()}${professionId.slice(1)} Suite`;
-  } else {
-    return <Navigate to="/" />;
+  if (!selectedProfessionId) {
+    return <Navigate to={ROUTES.setup} replace />;
   }
+
+  const presetTools = PRESET_TOOLS[selectedProfessionId] || [];
+  const activeTools: ToolFeature[] = isAdmin
+    ? ((customTools.length
+      ? customTools
+      : (TOOL_DEFINITIONS || []).map((item) => item.id as ToolFeature)) as ToolFeature[])
+    : isPaidPlan(plan)
+      ? Array.from(new Set([...(customTools || []), ...(presetTools || [])])) as ToolFeature[]
+      : (presetTools || []) as ToolFeature[];
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex justify-between items-end">
         <div>
-          <button onClick={() => navigate(`/dashboard/${professionId}`)} className="text-slate-500 font-semibold text-xs hover:underline mb-2 block">Back to Dashboard</button>
-          <h1 className="text-3xl font-black text-slate-900">{title}</h1>
-          <p className="text-slate-500 text-sm">Select a tool to start working.</p>
+          <button onClick={() => navigate(ROUTES.userDashboard)} className="text-subtle font-semibold text-xs hover:underline mb-2 block">Back to Dashboard</button>
+          <h1 className="text-3xl font-black">Selected Apps</h1>
+          <p className="text-subtle text-sm">Open any tool and start working.</p>
         </div>
       </div>
 
@@ -61,13 +59,13 @@ const ToolsView: React.FC = () => {
             <button
               key={tool}
               onClick={() => navigate(toolRouteMap[tool])}
-              className="bg-white p-5 rounded-xl border border-slate-200 text-left hover:shadow-md transition-all"
+              className="bg-surface p-5 rounded-xl border border-app text-left hover:shadow-md transition-all"
             >
-              <p className="text-xs uppercase tracking-wider text-slate-400 font-bold">{def?.category || 'Tool'}</p>
-              <h3 className="font-black text-slate-900 text-lg mt-1">{def?.label || tool}</h3>
-              <p className="text-xs text-slate-500 mt-1">{def?.description || 'Business workflow module'}</p>
+              <p className="text-xs uppercase tracking-wider text-subtle font-bold">{def?.category || 'Tool'}</p>
+              <h3 className="font-black text-lg mt-1">{def?.label || tool}</h3>
+              <p className="text-xs text-subtle mt-1">{def?.description || 'Business workflow module'}</p>
               <div className="flex items-center justify-end pt-4">
-                <ChevronRight size={16} className="text-slate-400" />
+                <ChevronRight size={16} className="text-subtle" />
               </div>
             </button>
           );

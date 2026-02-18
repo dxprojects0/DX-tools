@@ -13,6 +13,9 @@ const posSlice = createSlice({
   name: 'pos',
   initialState,
   reducers: {
+    hydratePos: (state, action: PayloadAction<POSState>) => {
+      state.invoices = action.payload.invoices || [];
+    },
     addInvoice: (state, action: PayloadAction<Invoice>) => {
       state.invoices.push(action.payload);
     },
@@ -26,5 +29,5 @@ const posSlice = createSlice({
   },
 });
 
-export const { addInvoice, deleteInvoice, togglePaymentStatus } = posSlice.actions;
+export const { hydratePos, addInvoice, deleteInvoice, togglePaymentStatus } = posSlice.actions;
 export default posSlice.reducer;

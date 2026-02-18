@@ -14,6 +14,9 @@ const repairSlice = createSlice({
   name: 'repairs',
   initialState,
   reducers: {
+    hydrateRepairs: (state, action: PayloadAction<RepairState>) => {
+      state.tickets = action.payload.tickets || [];
+    },
     addTicket: (state, action: PayloadAction<JobTicket>) => {
       state.tickets.push(action.payload);
     },
@@ -62,6 +65,7 @@ const repairSlice = createSlice({
 });
 
 export const { 
+  hydrateRepairs,
   addTicket, 
   updateStage, 
   updateTicketStatus, 

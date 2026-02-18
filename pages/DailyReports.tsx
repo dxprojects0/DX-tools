@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+﻿import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { shareData } from '../utils/share';
+import { printHtmlDocument } from '../utils/print';
 
 const DailyReports: React.FC = () => {
   const invoices = useSelector((state: RootState) => state.pos.invoices);
@@ -42,28 +43,46 @@ const DailyReports: React.FC = () => {
   }, 0);
 
   const downloadReport = () => {
-    const payload = {
-      date: today,
-      todaySales,
-      paid,
-      unpaid,
-      modeTotals,
-      topItems,
-      profitSnapshot,
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `daily-report-${today}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+    const modeRows = ['Cash', 'UPI', 'Card', 'Split']
+      .map((mode) => `<tr><td style="padding:6px 0;">${mode}</td><td style="text-align:right;">Rs ${modeTotals[mode] || 0}</td></tr>`)
+      .join('');
+    const itemRows = topItems.length
+      ? topItems.map(([name, qty]) => `<tr><td style="padding:6px 0;">${name}</td><td style="text-align:right;">${qty}</td></tr>`).join('')
+      : '<tr><td colspan="2" style="padding:6px 0;">No sales today.</td></tr>';
+
+    printHtmlDocument(
+      `Daily Report ${today}`,
+      `
+          <h1 style="margin:0 0 6px;">Daily Report</h1>
+          <p style="margin:0 0 18px; color:#64748b;">Date: ${today}</p>
+          <section style="border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:14px;">
+            <h3 style="margin:0 0 10px;">Summary</h3>
+            <p style="margin:4px 0;">Total Sales: <strong>Rs ${todaySales}</strong></p>
+            <p style="margin:4px 0;">Paid: <strong>Rs ${paid}</strong></p>
+            <p style="margin:4px 0;">Unpaid: <strong>Rs ${unpaid}</strong></p>
+            <p style="margin:4px 0;">Profit Snapshot: <strong>Rs ${Math.round(profitSnapshot)}</strong></p>
+          </section>
+          <section style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+            <div style="border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
+              <h3 style="margin:0 0 10px;">Payment Modes</h3>
+              <table style="width:100%">${modeRows}</table>
+            </div>
+            <div style="border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
+              <h3 style="margin:0 0 10px;">Top Items</h3>
+              <table style="width:100%">${itemRows}</table>
+            </div>
+          </section>
+      `,
+    );
   };
 
   const shareReport = () => {
-    const text = `Daily Report (${today})\nSales: Rs ${todaySales}\nPaid: Rs ${paid}\nUnpaid: Rs ${unpaid}\nProfit Snapshot: Rs ${Math.round(
-      profitSnapshot,
-    )}\nTop Items: ${topItems.map((t) => `${t[0]}(${t[1]})`).join(', ') || '-'}`;
+    const text = `*Daily Report* (${today})
+Sales: Rs ${todaySales}
+Paid: Rs ${paid}
+Unpaid: Rs ${unpaid}
+Profit Snapshot: Rs ${Math.round(profitSnapshot)}
+Top Items: ${topItems.map((t) => `${t[0]}(${t[1]})`).join(', ') || '-'}`;
     shareData('Daily Report', text);
   };
 
@@ -81,9 +100,9 @@ const DailyReports: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white border rounded-2xl p-4">Today Sales <div className="text-2xl font-black">Rs {todaySales}</div></div>
-        <div className="bg-white border rounded-2xl p-4">Paid vs Unpaid <div className="text-sm mt-1">Paid Rs {paid} | Unpaid Rs {unpaid}</div></div>
-        <div className="bg-white border rounded-2xl p-4">Profit Snapshot <div className="text-2xl font-black">Rs {Math.round(profitSnapshot)}</div></div>
+        <div className="bg-white border rounded-2xl p-4">Today Sales <div className="text-2xl font-black">₹ {todaySales}</div></div>
+        <div className="bg-white border rounded-2xl p-4">Paid vs Unpaid <div className="text-sm mt-1">Paid ₹ {paid} | Unpaid ₹ {unpaid}</div></div>
+        <div className="bg-white border rounded-2xl p-4">Profit Snapshot <div className="text-2xl font-black">₹ {Math.round(profitSnapshot)}</div></div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -91,7 +110,7 @@ const DailyReports: React.FC = () => {
           <h3 className="font-black mb-2">Payment Modes</h3>
           <div className="space-y-2 text-sm">
             {['Cash', 'UPI', 'Card', 'Split'].map((m) => (
-              <div key={m} className="flex justify-between"><span>{m}</span><span className="font-bold">Rs {modeTotals[m] || 0}</span></div>
+              <div key={m} className="flex justify-between"><span>{m}</span><span className="font-bold">₹ {modeTotals[m] || 0}</span></div>
             ))}
           </div>
         </div>

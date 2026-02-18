@@ -22,8 +22,9 @@ This application is built as a modular feature-flagged platform. Instead of sepa
 The full application state is persisted in `IndexedDB` (`bizop-db`) so onboarding, tool selection, tasks, and working data survive browser restarts.
 
 ### Security and Cloud Sync
-- Firebase auth entry points are available for Google and Phone OTP.
-- Firestore sync writes to `users/{uid}/dailyReports/{date}` and `users/{uid}/snapshots/latest`.
+- Firebase auth uses Google sign-in with profile-first onboarding.
+- Firestore user scope is `users/{uid}/profile/data`, `users/{uid}/dashboard/data`, `users/{uid}/inventory/data`, `users/{uid}/tasks/data`.
+- Free plan keeps operational data in IndexedDB only; Pro/Business sync to Firestore; Admin writes directly to Firestore.
 - Tenant isolation rules are defined in `firestore.rules` and `firebase.security.json`.
 
 # DX-tools
